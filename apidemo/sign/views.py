@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+from sign.models import Event, Guest
 
 
 def index(request):
@@ -31,7 +32,23 @@ def login_action(request):
 def event_manage(request):
     # username = request.session.get("user", "")
     username = request.user.username
-    return render(request, "event_manage.html", {"user": username})
+    events = Event.objects.all()
+    # for event in events:
+    #     print(event.name)
+    #     print(event.address)
+    return render(request, "event_manage.html", {"user": username, "events": events})
+
+@login_required
+def search_name(request):
+    search_name = request.GET.get("name")
+    events = Event.objects.filter(name__contains=search_name)
+    return render(request, "event_manage.html", {"events": events})
+
+@login_required
+def guest_manage(request):
+    username = request.user.username
+    guests = Guest.objects.all()
+    return render(request, "guest_manage.html", {"guests": guests})
 
 
 @login_required
