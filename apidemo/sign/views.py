@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import auth
@@ -47,8 +48,33 @@ def search_name(request):
 @login_required
 def guest_manage(request):
     username = request.user.username
-    guests = Guest.objects.all()
-    return render(request, "guest_manage.html", {"guests": guests})
+    guests = Guest.objects.get_queryset().order_by('id')
+    paginator = Paginator(guests, 3)
+    page = request.GET.get('page')
+    try:
+        contacts = paginator.page(page)
+    except PageNotAnInteger:
+        contacts = paginator.page(1)
+    except EmptyPage:
+        contacts = paginator.page(paginator.num_pages)
+    return render(request, "guest_manage.html", {"user": username, "guests": contacts})
+
+@login_required
+def search_phone(request):
+    username = request.user.username
+    search_phone = request.GET.get("phone", "")
+    guests = Guest.objects.filter(phone__contains=search_phone)
+    if len(guests) == 0:
+        return render(request, "guest_manage.html", {"user": username, "hint": "搜索结果为空！"})
+    paginator = Paginator(guests, 3)
+    page = request.GET.get('page')
+    try:
+        contacts = paginator.page(page)
+    except PageNotAnInteger:
+        contacts = paginator.page(1)
+    except EmptyPage:
+        contacts = paginator.page(paginator.num_pages)
+    return render(request, "guest_manage.html", {"user": username, "guests": contacts})
 
 
 @login_required
