@@ -26,5 +26,7 @@ urlpatterns = [
     path('search_name/', views.search_name),
     path('guest_manage/', views.guest_manage),
     path('search_phone/', views.search_phone),
-    path('logout/', views.logout)
+    path('logout/', views.logout),
+    path('sign_index/<int:event_id>/', views.sign_index),
+    path('sign_index_action/<int:event_id>/', views.sign_index_action),
 ]
